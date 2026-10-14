@@ -1,6 +1,6 @@
 {
   "name": "@mohit77u/realtime-kit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Lightweight, secure WebSocket toolkit: pub/sub + request/response for Node, Express, NestJS, React, Vue, Angular, Next.js & Nuxt.",
   "keywords": [
     "websocket",

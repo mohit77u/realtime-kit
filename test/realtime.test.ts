@@ -91,6 +91,33 @@ describe('pub/sub', () => {
   });
 });
 
+describe('connect/close races', () => {
+  beforeEach(() => start());
+
+  it('connect() -> close() -> connect() in one tick opens exactly one socket (React StrictMode / logout+login)', async () => {
+    const errors: unknown[] = [];
+    const c = mk({ autoConnect: false, auth: async () => 'tok' }); // async auth gives close() a window to race with open()
+    c.onError((e) => errors.push(e));
+    c.connect();
+    c.close();
+    c.connect();
+    await open(c);
+    await wait(100);
+    expect(rt.size).toBe(1);
+    expect(c.status).toBe('open');
+    expect(errors).toEqual([]);
+  });
+
+  it('a close() while auth is pending cancels the connection', async () => {
+    const c = mk({ autoConnect: false, auth: async () => { await wait(30); return 'tok'; } });
+    c.connect();
+    c.close();
+    await wait(120);
+    expect(rt.size).toBe(0);
+    expect(c.status).toBe('closed');
+  });
+});
+
 describe('security', () => {
   it('rejects unauthenticated clients and accepts valid tokens', async () => {
     await start({ authenticate: (_req, token) => (token === 'good' ? { name: 'ann' } : null) });

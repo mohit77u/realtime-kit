@@ -103,6 +103,8 @@ export class RealtimeClient {
   private attempts = 0;
   private timer: ReturnType<typeof setTimeout> | null = null;
   private manualClose = false;
+  /** Bumped by every open() and close(); lets a pending open() notice it has been superseded. */
+  private epoch = 0;
   private queue: string[] = [];
   private subs = new Map<string, Set<Handler>>();
   private pending = new Map<string, { resolve: (v: any) => void; reject: (e: Error) => void; timer: ReturnType<typeof setTimeout> }>();
@@ -131,6 +133,7 @@ export class RealtimeClient {
   /** Close for good (no reconnect). Pending requests are rejected. */
   close(): void {
     this.manualClose = true;
+    this.epoch++; // cancel any open() that is still waiting for `auth`
     if (this.timer) clearTimeout(this.timer);
     this.ws?.close(1000);
     this.ws = null;
@@ -257,14 +260,17 @@ export class RealtimeClient {
   // ---- internals ----
 
   private async open(): Promise<void> {
+    const epoch = ++this.epoch;
     this.setStatus(this.attempts === 0 ? 'connecting' : 'reconnecting');
     let token: string | undefined;
     try {
       token = await this.opts.auth?.();
     } catch {
+      if (epoch !== this.epoch) return;
       return this.scheduleReconnect();
     }
-    if (this.manualClose) return;
+    // close() or another connect() happened while we awaited `auth`: this attempt is stale.
+    if (epoch !== this.epoch || this.manualClose) return;
 
     const WS = this.opts.WebSocket ?? globalThis.WebSocket;
     const protocols = token ? [SUBPROTOCOL, AUTH_PROTOCOL_PREFIX + token] : [SUBPROTOCOL];
@@ -272,7 +278,7 @@ export class RealtimeClient {
     this.ws = ws;
 
     ws.onmessage = (ev: MessageEvent) => {
-      if (typeof ev.data !== 'string') return;
+      if (this.ws !== ws || typeof ev.data !== 'string') return;
       let frame: ServerFrame;
       try { frame = JSON.parse(ev.data); } catch { return; }
       this.handleFrame(frame);
