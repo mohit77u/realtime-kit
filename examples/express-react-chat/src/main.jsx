@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { createRealtimeClient } from 'realtime-kit/client';
-import { useChannel, useConnectionStatus, useDirect, useRoom } from 'realtime-kit/react';
+import { createRealtimeClient } from '@mohit77u/realtime-kit/client';
+import { useChannel, useConnectionStatus, useDirect, useRoom } from '@mohit77u/realtime-kit/react';
 
 const name = new URLSearchParams(location.search).get('name') || 'guest';
 const rt = createRealtimeClient({

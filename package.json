@@ -1,5 +1,5 @@
 {
-  "name": "realtime-kit",
+  "name": "@mohit77u/realtime-kit",
   "version": "0.1.0",
   "description": "Lightweight, secure WebSocket toolkit: pub/sub + request/response for Node, Express, NestJS, React, Vue, Angular, Next.js & Nuxt.",
   "keywords": [
@@ -19,6 +19,9 @@
     "scaling"
   ],
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "author": "Mohit Singh",
   "repository": {
     "type": "git",

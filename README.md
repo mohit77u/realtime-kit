@@ -1,4 +1,4 @@
-# realtime-kit
+# @mohit77u/realtime-kit
 
 Lightweight, secure WebSocket toolkit for **chat rooms, direct messages, live updates, notifications and presence**. Works with Node, Express, NestJS, Next.js, React, Vue, Nuxt, Angular and plain JavaScript. Scales to several servers with Redis.
 
@@ -30,24 +30,26 @@ Lightweight, secure WebSocket toolkit for **chat rooms, direct messages, live up
 ## 1. Install
 
 ```bash
-npm install realtime-kit
+npm install @mohit77u/realtime-kit
 ```
+
+> The package is published under the scope `@mohit77u`, so every import uses the full name, e.g. `@mohit77u/realtime-kit/server`.
 
 Install only what your stack needs. Framework packages are optional peer dependencies:
 
 | You use | Also have installed | Import from |
 |---|---|---|
-| Node / Express / any Node server | – | `realtime-kit/server` |
-| Any browser app or Node script | – | `realtime-kit/client` |
-| React / Next.js | `react >= 17` | `realtime-kit/react` |
-| Vue 3 / Nuxt 3 | `vue >= 3.3` | `realtime-kit/vue` |
-| Angular | `rxjs >= 7` | `realtime-kit/angular` |
-| NestJS | `@nestjs/common`, `@nestjs/core >= 9`, `reflect-metadata` | `realtime-kit/nest` |
-| Several server instances | `ioredis >= 5` and a Redis server | `realtime-kit/redis` |
+| Node / Express / any Node server | – | `@mohit77u/realtime-kit/server` |
+| Any browser app or Node script | – | `@mohit77u/realtime-kit/client` |
+| React / Next.js | `react >= 17` | `@mohit77u/realtime-kit/react` |
+| Vue 3 / Nuxt 3 | `vue >= 3.3` | `@mohit77u/realtime-kit/vue` |
+| Angular | `rxjs >= 7` | `@mohit77u/realtime-kit/angular` |
+| NestJS | `@nestjs/common`, `@nestjs/core >= 9`, `reflect-metadata` | `@mohit77u/realtime-kit/nest` |
+| Several server instances | `ioredis >= 5` and a Redis server | `@mohit77u/realtime-kit/redis` |
 
 Requirements: Node 18+ on the server, any modern browser on the client.
 
-> **Which entry do I import?** Backend code imports `realtime-kit/server` (or `/nest`, `/redis`). Frontend code imports `realtime-kit/client` plus your framework helper. **Never import `/server` or `/redis` in frontend code.**
+> **Which entry do I import?** Backend code imports `@mohit77u/realtime-kit/server` (or `/nest`, `/redis`). Frontend code imports `@mohit77u/realtime-kit/client` plus your framework helper. **Never import `/server` or `/redis` in frontend code.**
 
 ---
 
@@ -86,7 +88,7 @@ A complete working chat in two files. (A fuller example with history, DMs and Re
 ```js
 import http from 'node:http';
 import express from 'express';
-import { createRealtimeServer } from 'realtime-kit/server';
+import { createRealtimeServer } from '@mohit77u/realtime-kit/server';
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -105,8 +107,8 @@ httpServer.listen(3000);
 
 ```tsx
 import { useState } from 'react';
-import { createRealtimeClient } from 'realtime-kit/client';
-import { useRoom } from 'realtime-kit/react';
+import { createRealtimeClient } from '@mohit77u/realtime-kit/client';
+import { useRoom } from '@mohit77u/realtime-kit/react';
 
 const rt = createRealtimeClient({ url: 'ws://localhost:3000/realtime', auth: () => 'ann', autoConnect: false });
 
@@ -138,21 +140,21 @@ The server **attaches to an existing HTTP server** (sharing your port, TLS and p
 
 ```js
 import http from 'node:http';
-import { createRealtimeServer } from 'realtime-kit/server';
+import { createRealtimeServer } from '@mohit77u/realtime-kit/server';
 
 const httpServer = http.createServer((req, res) => res.end('ok'));
 const rt = createRealtimeServer({ server: httpServer, allowedOrigins: ['https://app.example.com'] });
 httpServer.listen(3000);
 ```
 
-Without `server`, pass `port` and realtime-kit creates its own HTTP server: `createRealtimeServer({ port: 3000 })`. CommonJS works too: `const { createRealtimeServer } = require('realtime-kit/server')`.
+Without `server`, pass `port` and realtime-kit creates its own HTTP server: `createRealtimeServer({ port: 3000 })`. CommonJS works too: `const { createRealtimeServer } = require('@mohit77u/realtime-kit/server')`.
 
 ### 4.2 Express
 
 ```js
 import http from 'node:http';
 import express from 'express';
-import { createRealtimeServer, RealtimeError } from 'realtime-kit/server';
+import { createRealtimeServer, RealtimeError } from '@mohit77u/realtime-kit/server';
 
 const app = express();
 const httpServer = http.createServer(app);              // 1. wrap Express in an http server
@@ -181,13 +183,13 @@ httpServer.listen(3000);                                 // 4. listen on httpSer
 
 ### 4.3 NestJS (Express or Fastify)
 
-Install: `npm i realtime-kit @nestjs/common @nestjs/core reflect-metadata`
+Install: `npm i @mohit77u/realtime-kit @nestjs/common @nestjs/core reflect-metadata`
 
 **Step 1 – register the module** (`app.module.ts`):
 
 ```ts
 import { Module } from '@nestjs/common';
-import { RealtimeModule } from 'realtime-kit/nest';
+import { RealtimeModule } from '@mohit77u/realtime-kit/nest';
 
 @Module({
   imports: [
@@ -220,7 +222,7 @@ RealtimeModule.forRootAsync({
 
 ```ts
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { RealtimeService, RealtimeError } from 'realtime-kit/nest';
+import { RealtimeService, RealtimeError } from '@mohit77u/realtime-kit/nest';
 
 @Injectable()
 export class OrdersService implements OnModuleInit {
@@ -265,7 +267,7 @@ Next.js route handlers and Vercel/serverless functions **cannot hold WebSocket c
 ```js
 const http = require('node:http');
 const next = require('next');
-const { createRealtimeServer } = require('realtime-kit/server');
+const { createRealtimeServer } = require('@mohit77u/realtime-kit/server');
 
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
@@ -330,7 +332,7 @@ Notes:
 All clients share the same core:
 
 ```ts
-import { createRealtimeClient } from 'realtime-kit/client';
+import { createRealtimeClient } from '@mohit77u/realtime-kit/client';
 
 const rt = createRealtimeClient({
   url: 'wss://api.example.com/realtime',   // ws:// for local dev, wss:// in production
@@ -374,8 +376,8 @@ const rt = createRealtimeClient({ url: 'ws://localhost:3000/realtime', WebSocket
 
 ```tsx
 import { useState } from 'react';
-import { createRealtimeClient } from 'realtime-kit/client';
-import { useChannel, useConnectionStatus, useDirect, useRoom } from 'realtime-kit/react';
+import { createRealtimeClient } from '@mohit77u/realtime-kit/client';
+import { useChannel, useConnectionStatus, useDirect, useRoom } from '@mohit77u/realtime-kit/react';
 
 const rt = createRealtimeClient({ url: 'wss://api.example.com/realtime', auth: () => localStorage.getItem('token') ?? undefined, autoConnect: false });
 
@@ -410,8 +412,8 @@ Realtime code lives in a **client component** (`'use client'`). Create the clien
 // app/chat/page.js
 'use client';
 import { useState } from 'react';
-import { createRealtimeClient } from 'realtime-kit/client';
-import { useConnectionStatus, useRoom } from 'realtime-kit/react';
+import { createRealtimeClient } from '@mohit77u/realtime-kit/client';
+import { useConnectionStatus, useRoom } from '@mohit77u/realtime-kit/react';
 
 const rt = createRealtimeClient({
   url: typeof location !== 'undefined'
@@ -436,8 +438,8 @@ The server HTML renders `status: idle`; the browser connects after hydration (no
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue';
-import { createRealtimeClient } from 'realtime-kit/client';
-import { useChannel, useConnectionStatus, useDirect, useRoom } from 'realtime-kit/vue';
+import { createRealtimeClient } from '@mohit77u/realtime-kit/client';
+import { useChannel, useConnectionStatus, useDirect, useRoom } from '@mohit77u/realtime-kit/vue';
 
 const rt = createRealtimeClient({ url: 'ws://localhost:3000/realtime', auth: () => 'my-token', autoConnect: false });
 
@@ -466,7 +468,7 @@ Composables clean up automatically when the component (or effect scope) is destr
 **Step 1 – plugin** `plugins/realtime.ts` (a normal universal plugin works):
 
 ```ts
-import { createRealtimeClient } from 'realtime-kit/client';
+import { createRealtimeClient } from '@mohit77u/realtime-kit/client';
 
 export default defineNuxtPlugin(() => {
   const rt = createRealtimeClient({
@@ -482,7 +484,7 @@ export default defineNuxtPlugin(() => {
 
 ```vue
 <script setup lang="ts">
-import { useRoom, useDirect } from 'realtime-kit/vue';
+import { useRoom, useDirect } from '@mohit77u/realtime-kit/vue';
 const { $rt } = useNuxtApp();
 const msgs = ref<string[]>([]);
 const room = useRoom<{ text: string }>($rt, 'public-general', (m) => msgs.value.push(`${m.from}: ${m.data.text}`));
@@ -498,8 +500,8 @@ SSR output is `idle`; the connection starts on mount in the browser (no hydratio
 ```ts
 import { AsyncPipe } from '@angular/common';
 import { Component, signal } from '@angular/core';
-import { createRealtimeClient } from 'realtime-kit/client';
-import { channel$, direct$, members$, request$, room$, status$ } from 'realtime-kit/angular';
+import { createRealtimeClient } from '@mohit77u/realtime-kit/client';
+import { channel$, direct$, members$, request$, room$, status$ } from '@mohit77u/realtime-kit/angular';
 
 @Component({
   selector: 'app-chat',
@@ -724,8 +726,8 @@ npm install ioredis
 ```
 
 ```js
-import { createRealtimeServer } from 'realtime-kit/server';
-import { createRedisAdapter } from 'realtime-kit/redis';
+import { createRealtimeServer } from '@mohit77u/realtime-kit/server';
+import { createRedisAdapter } from '@mohit77u/realtime-kit/redis';
 
 const rt = createRealtimeServer({
   server: httpServer,
@@ -791,7 +793,7 @@ To try it locally: `docker run -p 6379:6379 redis`, then start two instances of 
 
 ## 11. API reference
 
-### `createRealtimeServer(options)` — `realtime-kit/server`
+### `createRealtimeServer(options)` — `@mohit77u/realtime-kit/server`
 
 | Option | Default | Description |
 |---|---|---|
@@ -831,11 +833,11 @@ Returned server object:
 
 `RealtimeError(code, message)` — `code` is one of `bad_request`, `forbidden`, `rate_limited`, `not_found`, `internal`. Thrown from request handlers and hooks, it reaches the client as the same code and message; any other error becomes `{ code: 'internal', message: 'internal error' }`.
 
-### `createRedisAdapter(options)` — `realtime-kit/redis`
+### `createRedisAdapter(options)` — `@mohit77u/realtime-kit/redis`
 
 `{ url?, options?, client?, channel?, onError? }` — see section 9.
 
-### `createRealtimeClient(options)` — `realtime-kit/client`
+### `createRealtimeClient(options)` — `@mohit77u/realtime-kit/client`
 
 | Option | Default | Description |
 |---|---|---|
@@ -879,10 +881,10 @@ Error codes on the client: the server codes above plus `timeout`, `disconnected`
 
 | Package | Exports |
 |---|---|
-| `realtime-kit/react` | `useRoom(client, room, onMessage?)` → `{ joined, members, error, send, history }` · `useDirect(client, handler)` · `useChannel(client, channel, handler)` · `useConnectionStatus(client)` |
-| `realtime-kit/vue` | the same four composables; arguments accept refs/getters, results are refs |
-| `realtime-kit/angular` | `room$`, `members$`, `presence$`, `direct$`, `channel$`, `status$`, `request$` |
-| `realtime-kit/nest` | `RealtimeModule.forRoot / forRootAsync`, `RealtimeService`, `RealtimeError` |
+| `@mohit77u/realtime-kit/react` | `useRoom(client, room, onMessage?)` → `{ joined, members, error, send, history }` · `useDirect(client, handler)` · `useChannel(client, channel, handler)` · `useConnectionStatus(client)` |
+| `@mohit77u/realtime-kit/vue` | the same four composables; arguments accept refs/getters, results are refs |
+| `@mohit77u/realtime-kit/angular` | `room$`, `members$`, `presence$`, `direct$`, `channel$`, `status$`, `request$` |
+| `@mohit77u/realtime-kit/nest` | `RealtimeModule.forRoot / forRootAsync`, `RealtimeService`, `RealtimeError` |
 
 ---
 
@@ -931,7 +933,7 @@ Your responsibility:
 | Express: nothing connects | You called `app.listen()` instead of `httpServer.listen()`. |
 | Next.js: hydration warning or crash on the server | Client created without `autoConnect: false`, or used outside a `'use client'` component. |
 | Nuxt / Angular SSR: socket opened on the server | Client created without `autoConnect: false`. |
-| TypeScript: `Cannot find module 'realtime-kit/nest'` | Use the latest version; classic `moduleResolution: node` is supported through `typesVersions`. |
+| TypeScript: `Cannot find module '@mohit77u/realtime-kit/nest'` | Use the latest version; classic `moduleResolution: node` is supported through `typesVersions`. |
 | `WebSocket is not defined` | Client code on Node < 22: pass `WebSocket` from `ws`. |
 | Nest: `RealtimeService` is `undefined` in a constructor | Add `@Inject(RealtimeService)` if your build tool (esbuild/SWC/vitest) does not emit decorator metadata. |
 

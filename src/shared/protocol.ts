@@ -48,7 +48,7 @@ export type ErrorCode =
 
 /**
  * Connects several server instances so a publish on one reaches clients on all of them.
- * Implemented by `realtime-kit/redis`; you can write your own (NATS, Kafka, ...).
+ * Implemented by `@mohit77u/realtime-kit/redis`; you can write your own (NATS, Kafka, ...).
  */
 export interface ClusterAdapter {
   /** Send a serialized event to all instances (including this one; the server ignores its own). */

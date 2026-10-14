@@ -94,7 +94,7 @@ export interface RealtimeServerOptions<User = unknown> {
    */
   authorize?: (ctx: ClientContext<User>, action: Action, channel: string) => boolean | Promise<boolean>;
   /**
-   * Connect several server instances (e.g. `createRedisAdapter(...)` from "realtime-kit/redis")
+   * Connect several server instances (e.g. `createRedisAdapter(...)` from "@mohit77u/realtime-kit/redis")
    * so publishes reach clients on every instance.
    */
   adapter?: ClusterAdapter;

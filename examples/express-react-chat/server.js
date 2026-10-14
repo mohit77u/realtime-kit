@@ -1,8 +1,8 @@
 import http from 'node:http';
 import express from 'express';
 import { Redis } from 'ioredis';
-import { createRealtimeServer, RealtimeError } from 'realtime-kit/server';
-import { createRedisAdapter } from 'realtime-kit/redis';
+import { createRealtimeServer, RealtimeError } from '@mohit77u/realtime-kit/server';
+import { createRedisAdapter } from '@mohit77u/realtime-kit/redis';
 
 const PORT = Number(process.env.PORT || 3000);
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
