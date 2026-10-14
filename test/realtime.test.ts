@@ -33,7 +33,8 @@ afterEach(async () => {
 });
 
 describe('pub/sub', () => {
-  beforeEach(() => start());
+  const logged: unknown[] = [];
+  beforeEach(() => { logged.length = 0; return start({ onError: (e) => logged.push(e) }); }); // capture server-side logs
 
   it('delivers server publishes to subscribers', async () => {
     const c = mk();
@@ -64,6 +65,7 @@ describe('pub/sub', () => {
     await open(c);
     expect(await c.request('add', { a: 1, b: 2 })).toBe(3);
     await expect(c.request('boom')).rejects.toMatchObject({ code: 'internal', message: 'internal error' });
+    expect(logged.map((e) => (e as Error).message)).toEqual(['secret db password']); // detail stays in the server log only
     await expect(c.request('nope')).rejects.toMatchObject({ code: 'forbidden' });
     await expect(c.request('missing')).rejects.toMatchObject({ code: 'not_found' });
   });
