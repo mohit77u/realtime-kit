@@ -13,6 +13,7 @@ import {
   RealtimeError,
   type ClientContext,
   type RealtimeServer,
+  type RoomHandle,
   type RealtimeServerOptions,
 } from '../server';
 
@@ -65,6 +66,34 @@ export class RealtimeService<User = unknown> implements OnApplicationBootstrap, 
 
   disconnect(clientId: string, code?: number, reason?: string): void {
     this.rt?.disconnect(clientId, code, reason);
+  }
+
+  /** Close all connections of a user (logout, ban). */
+  disconnectUser(userId: string | number, code?: number, reason?: string): void {
+    this.rt?.disconnectUser(userId, code, reason);
+  }
+
+  /** Direct message / notification to every tab and device of a user. Returns local deliveries. */
+  sendToUser(userId: string | number, data?: unknown, opts?: { from?: string }): number {
+    return this.rt?.sendToUser(userId, data, opts) ?? 0;
+  }
+
+  /** Server-side access to a room (broadcast from your own code, list members). */
+  room(name: string): RoomHandle {
+    const svc = this;
+    return {
+      send: (data) => this.rt?.room(name).send(data) ?? 0,
+      members: () => this.rt?.room(name).members() ?? [],
+      get size() { return svc.rt?.room(name).size ?? 0; },
+    };
+  }
+
+  isOnline(userId: string | number): boolean {
+    return this.rt?.isOnline(userId) ?? false;
+  }
+
+  onlineUsers(): string[] {
+    return this.rt?.onlineUsers() ?? [];
   }
 
   get size(): number {

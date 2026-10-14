@@ -8,6 +8,7 @@ export default defineConfig({
     'vue/index': 'src/vue/index.ts',
     'angular/index': 'src/angular/index.ts',
     'nest/index': 'src/nest/index.ts',
+    'redis/index': 'src/redis/index.ts',
   },
   format: ['esm', 'cjs'],
   dts: true,
@@ -15,6 +16,6 @@ export default defineConfig({
   minify: false,
   treeshake: true,
   target: 'es2020',
-  external: ['ws', 'react', 'vue', 'rxjs', '@nestjs/common', '@nestjs/core', 'reflect-metadata'],
+  external: ['ws', 'react', 'vue', 'rxjs', '@nestjs/common', '@nestjs/core', 'reflect-metadata', 'ioredis'],
   outExtension: ({ format }) => ({ js: format === 'cjs' ? '.cjs' : '.js' }),
 });

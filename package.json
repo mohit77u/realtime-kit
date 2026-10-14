@@ -13,7 +13,10 @@
     "vue",
     "angular",
     "nextjs",
-    "nuxt"
+    "nuxt",
+    "redis",
+    "cluster",
+    "scaling"
   ],
   "license": "MIT",
   "author": "Mohit Singh",
@@ -96,6 +99,16 @@
         "default": "./dist/nest/index.cjs"
       }
     },
+    "./redis": {
+      "import": {
+        "types": "./dist/redis/index.d.ts",
+        "default": "./dist/redis/index.js"
+      },
+      "require": {
+        "types": "./dist/redis/index.d.cts",
+        "default": "./dist/redis/index.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "scripts": {
@@ -114,7 +127,8 @@
     "react": ">=17",
     "reflect-metadata": ">=0.1.13",
     "rxjs": ">=7",
-    "vue": ">=3.3"
+    "vue": ">=3.3",
+    "ioredis": ">=5"
   },
   "peerDependenciesMeta": {
     "react": {
@@ -134,6 +148,9 @@
     },
     "reflect-metadata": {
       "optional": true
+    },
+    "ioredis": {
+      "optional": true
     }
   },
   "devDependencies": {
@@ -144,6 +161,7 @@
     "@types/node": "^22.0.0",
     "@types/react": "^18.3.0",
     "@types/ws": "^8.5.12",
+    "ioredis": "^5.11.1",
     "react": "^18.3.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
@@ -171,6 +189,9 @@
       ],
       "nest": [
         "dist/nest/index.d.ts"
+      ],
+      "redis": [
+        "dist/redis/index.d.ts"
       ]
     }
   }

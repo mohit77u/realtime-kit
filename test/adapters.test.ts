@@ -10,8 +10,8 @@ import WebSocket from 'ws';
 import { afterEach, describe, expect, it } from 'vitest';
 import { createRealtimeServer } from '../src/server';
 import { RealtimeClient } from '../src/client';
-import { useChannel as useVueChannel, useConnectionStatus } from '../src/vue';
-import { channel$, request$, status$ } from '../src/angular';
+import { useChannel as useVueChannel, useConnectionStatus, useDirect as useVueDirect, useRoom as useVueRoom } from '../src/vue';
+import { channel$, direct$, members$, request$, room$, status$ } from '../src/angular';
 import { RealtimeModule, RealtimeService, RealtimeError } from '../src/nest';
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -20,7 +20,7 @@ afterEach(async () => { for (const fn of cleanup.splice(0)) await fn(); });
 
 async function plain() {
   const http = createServer();
-  const rt = createRealtimeServer({ server: http });
+  const rt = createRealtimeServer({ server: http, userId: (u: any) => u.id, authenticate: () => ({ id: 'me' }), rooms: { canJoin: () => true } });
   await new Promise<void>((r) => http.listen(0, r));
   const url = `ws://127.0.0.1:${(http.address() as AddressInfo).port}/realtime`;
   const client = new RealtimeClient({ url, WebSocket: WebSocket as any });
@@ -72,6 +72,41 @@ describe('angular (rxjs)', () => {
     expect(await firstValueFrom(status$(client))).toBe('open');
     await wait(40);
     expect(rt.publish('n', 3)).toBe(0); // unsubscribed after take(2)
+  });
+});
+
+describe('rooms in vue / rxjs', () => {
+  it('vue useRoom joins, receives, tracks members, leaves on scope stop; useDirect receives', async () => {
+    const { rt, client } = await plain();
+    const got: unknown[] = []; const dms: unknown[] = [];
+    const scope = effectScope();
+    const r = scope.run(() => { useVueDirect(client, (m) => dms.push(m.data)); return useVueRoom<string>(client, 'r1', (m) => got.push(m.data)); })!;
+    await wait(80);
+    expect(r.joined.value).toBe(true);
+    expect(r.members.value).toEqual(['me']);
+    await r.send('hello');
+    rt.sendToUser('me', 'ping');
+    await wait(60);
+    expect(got).toEqual(['hello']);
+    expect(dms).toEqual(['ping']);
+    scope.stop();
+    await wait(60);
+    expect(rt.room('r1').size).toBe(0);
+  });
+
+  it('rxjs room$ / members$ / direct$ join on subscribe and leave on unsubscribe', async () => {
+    const { rt, client } = await plain();
+    const msgs = firstValueFrom(room$<string>(client, 'r2').pipe(take(1)));
+    const members = firstValueFrom(members$(client, 'r2').pipe(take(1)));
+    const dm = firstValueFrom(direct$<string>(client).pipe(take(1)));
+    await wait(80);
+    rt.room('r2').send('from server');
+    rt.sendToUser('me', 'note');
+    expect((await msgs).data).toBe('from server');
+    expect(await members).toEqual(['me']);
+    expect((await dm).data).toBe('note');
+    await wait(60);
+    expect(rt.room('r2').size).toBe(0); // both subscriptions ended -> left
   });
 });
 
